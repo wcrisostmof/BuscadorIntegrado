@@ -1,0 +1,303 @@
+<!-- saved from url=(0014)about:internet -->
+<html>
+<head>
+  <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+  <title>Sectores y Manzanas TDP</title>
+<!-- 
+modified from original page at:
+http://www.geocontext.org/dir/2010/test-geoxml3/test2/state_capitals.kml
+L. Ross 9/13/2010
+-->
+    <style type="text/css">
+      html, body, #map_canvas { margin: 0; padding: 0; width:100%; height:99%; }
+   .labels {
+     color: blue;
+     background-color: white;
+     font-family: Georgia, Cambria, Times, "Times New Roman";
+     font-size: 9px;
+     font-weight: bold;
+     text-align: center;
+     width: 75px;     
+     border: 0px solid black;
+     white-space: nowrap;
+   }
+   span{
+     font-family: Cambria, Times, Arial,"Times New Roman";
+   }
+   input[type='text'],input[type='textbox']{
+    border-color: #b7babc;
+    font-family: verdana,arial;
+    border-radius: 5px;
+    border: 0 solid #ececec;
+    height: 30px;
+    text-align: center;
+    box-shadow: 2px -1px 2px #757573;
+    background-color: #222222; 
+    background: -moz-linear-gradient(top , #FFF, #fff,#F6F4F4,#7A7979); 
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0.7, #FFF), color-stop(1.0, #767474)); 
+    padding-bottom: 5px;
+   }
+   input[type='button']{
+     box-shadow: 0 0 5px #757573;
+     border-radius: 9px;
+     background-color: #38B0EE; 
+     background: -moz-linear-gradient(top , #FFF, #C8E8FE,#77C9F3,#38B0EE); 
+     background: -webkit-gradient(linear, left top, left bottom, color-stop(0.2, #fff), color-stop(1.0, #38B0EE));
+     color: #505050; 
+     height: 30PX;
+   }
+   input[type='button']:hover{
+     cursor:pointer;
+     background-color: #5EC3F7; 
+     background: -moz-linear-gradient(top , #FFF, #DDEFFC,#8ED4F8,#5EC3F7); 
+     background: -webkit-gradient(linear, left top, left bottom, color-stop(0.3, #fff), color-stop(2.0, #5EC3F7));
+     color: #161616;
+
+
+   }
+   #RUC{
+   
+    width: 100px;
+   }
+   #LabelRUC{
+    position: relative;
+    top: -11px;
+    left: 45px;
+    font-size: 9px;
+    color: #5E5F5F;
+   }
+   #LabelLat{
+    position: relative;
+    top: -11px;
+    left: 45px;
+    font-size: 9px;
+    color: #5E5F5F;
+   }
+   #latlongclicked{
+      color: #CF1414;
+   }
+   #cabeceraInput{
+    position: absolute;
+    top: 1px;
+    z-index: 100;
+   }
+
+    </style>
+
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA6rWtu915obqLIyWQciXZvm7ON8b5aG7g&signed_in=true&libraries=places&callback=initMap" async defer></script>
+
+  <script type="text/javascript">
+   
+  
+  var map;
+	var geocoder;
+	var markers = [];
+	var markersE = [];
+  var markerE;
+	var markerA;
+	var marker;
+	//var infowindow = new google.maps.InfoWindow();
+	var markerR;
+  var test = 0;
+ //google.load('visualization', '1', {'packages':['corechart', 'table', 'geomap']});
+  var geoxml = null;
+
+
+function codeLatLng() {
+  var input = document.getElementById('latlongclicked').value;
+  var latlngStr = input.split('|', 2);
+  var lat = parseFloat(latlngStr[1]);
+  var lng = parseFloat(latlngStr[0]);
+  var latlng = new google.maps.LatLng(lat, lng);
+  geocoder.geocode({'latLng': latlng}, function(results, status) {
+    if (status == google.maps.GeocoderStatus.OK) {
+      if (results[1]) {
+        map.setZoom(14);
+	if(test == 0){      
+	  markerR = new google.maps.Marker({
+            position: latlng,
+            map: map
+        });
+		test = test + 1;
+		} else {
+		markerR.setPosition(latlng);
+		}
+	//	alert(test);
+	 //infowindow.setContent(results[1].formatted_address);
+     //   infowindow.open(map, markerR);
+      } else {
+        alert('No results found');
+      }
+    } else {
+      alert('Geocoder failed due to: ' + status);
+    }
+  });
+}
+	
+
+    function initMap() {
+        	  geocoder = new google.maps.Geocoder();
+            var myLatlng = new google.maps.LatLng(-12.04150326, -77.09448189);
+        	  var origin_input = document.getElementById('address');
+        	  var options = {
+        	     componentRestrictions: {country: 'pe'}
+        		};
+        	  
+        	  
+        	  var autocomplete_origin = new google.maps.places.Autocomplete(origin_input, options);
+        	  
+              var myOptions = {
+                zoom: 5,
+                center: myLatlng,
+        		//streetViewControl: false,
+        		    disableDoubleClickZoom: true,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+              };
+              map = new google.maps.Map(document.getElementById('map_canvas'), myOptions);
+
+        // 	   geoXml = new geoXML3.parser({map: map, singleInfoWindow: true});	
+        	   
+        	   //getMarkers();
+        			  
+                google.maps.event.addListener(map,'zoom_changed',function () {
+                     if (map.getZoom() >= 16) showMarkers();
+                     if (map.getZoom() <= 15) eraseMarkers();
+
+                    });
+        			
+        	//google.maps.event.addListener(map, "bounds_changed", updateAxes);	
+        	
+        	google.maps.event.addListener(map,'click',function(event) {
+        	var latitude = event.latLng.lat().toFixed(8);
+        	var longitude = event.latLng.lng().toFixed(8);
+      		document.getElementById('latlongclicked').value = longitude + '|' + latitude + '|';
+      	  document.getElementById('hdnData_Lat').value = latitude
+      	  document.getElementById('hdnData_Long').value = longitude
+        		var latlng_ = new google.maps.LatLng(latitude, longitude);
+        		if(test == 0){      
+        	       markerR = new google.maps.Marker({
+                    position: latlng_,
+                    map: map
+                  });
+
+        		      test = test + 1;
+        		} else {
+        	   	markerR.setPosition(latlng_);
+        		}
+        		//infowindow.close();
+        		//markerR.setPosition(latlng_);
+        	});
+        	
+	
+    };
+
+   function eraseMarkers() {
+        for (i = 0; i < markers.length; i++) { 
+            markers[i].setVisible(false);
+        }
+
+      }
+
+    function showMarkers() {
+        for (i = 0; i < markers.length; i++) { 
+            markers[i].setVisible(true);
+        }
+
+      }
+
+
+
+
+
+  function codeAddress() {
+    var address = document.getElementById("address").value;
+    geocoder.geocode( { 'address': address}, function(results, status) {
+      if (status == google.maps.GeocoderStatus.OK) {
+        map.setCenter(results[0].geometry.location);
+		map.setZoom(16);
+		var c = map.getCenter();
+	  document.getElementById('latlongclicked').value = c.lng().toFixed(8) + '|' + c.lat().toFixed(8)+ '|';
+	  document.getElementById('hdnData_Lat').value = c.lat().toFixed(8);
+	  document.getElementById('hdnData_Long').value = c.lng().toFixed(8);
+	  
+ //       var marker = new google.maps.Marker({
+ //           map: map, 
+ //           position: results[0].geometry.location
+ //       });
+	codeLatLng();
+      } else {
+        alert("Geocode was not successful for the following reason: " + status);
+      }
+    });
+  }
+function EnviarPorTeclado(e){
+      if(e.which==13){
+          codeAddress();
+      }
+
+    
+}
+
+ 
+
+
+
+ 
+
+   
+ function sendMail() {
+ 
+ if (document.getElementById('latlongclicked').value==""){
+ alert("Debe hacer click en el lugar donde desea consultar la oferta");
+
+ }
+ else{
+    if (document.getElementById('RUC').value.length==8 || document.getElementById('RUC').value.length==11){
+      //var link = "mailto:Victor Aizcorbe Gallegos <victor.aizcorbe@telefonica.com>"
+      var link = "mailto:Luis Llerena Lagunes<luis.llerena@telefonica.com>"
+               //+ "?cc=gianfranco.martel@telefonica.com"
+               + "?subject=" + escape("aavemail")
+               + "&body=" + escape(document.getElementById('latlongclicked').value + document.getElementById('RUC').value +"|");
+                window.location.href = link;
+
+     }else{
+        alert("Debe ingresar el DNI o RUC, antes de consultar....!!!");
+        document.getElementById('RUC').focus();
+     }
+               
+   
+	}
+}  
+   
+   
+ //   google.maps.event.addDomListener(window, 'load', initialize);   
+  </script>
+</head>
+<body >
+
+<div id='cabeceraInput'>
+   <span id='LabelRUC'>RUC/DNI: </span><input type="text" value="" name='RUC' id='RUC' maxlength="11" >
+    
+    <input id="address" style="width: 350px;" type="text" onKeyUp="EnviarPorTeclado(event)" value="ingrese urbanizacion, distrito, provincia ó Y, X ó lat, Long" />
+    <input onclick="codeAddress()" type="button" value="    Ir a:" />
+<span id="LabelLat">Lat | Lng: </span>  <input type="text" style="width: 200px;" id="latlongclicked" readonly>
+   <input onclick="sendMail(); return false" type="button" value="Consultar Oferta:" />
+   
+</div>
+  <div id="map_canvas"></div>
+ 	<input id="hdnData_Long" type="hidden" value="test"/>
+	<input id="hdnData_Lat" type="hidden" value="test"/> 
+  
+<!--script src="http://www.google-analytics.com/urchin.js" type="text/javascript"> 
+</script> 
+<script type="text/javascript"> 
+_uacct = "UA-162157-1";
+urchinTracker();
+</script--> 
+
+
+
+</body>
+</html>
